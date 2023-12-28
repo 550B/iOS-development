@@ -7,6 +7,8 @@
 
 import SpriteKit
 
+import UIKit
+
 import GameKit
 
 import AVFoundation
@@ -310,6 +312,128 @@ class GameSceneHelper: SKScene {
         readyScreen.show()
         
     }
+    
+    
+//    private func tapImageView() {
+//        let authorizationStatus = PHPhotoLibrary.authorizationStatus()
+//
+//        if authorizationStatus == .notDetermined {
+//            /// 首次保存 权限未知 需进行相册权限授权操作
+//            PHPhotoLibrary.requestAuthorization { status in
+//                if status == .authorized {
+//                    if let image = self.imageView.image {
+//                        self.saveImage(image: image)
+//                    }
+//
+//                } else {
+//                    self.alertUser(message: "请在iPhone的“设置--隐私--相册”选项中，允许此App访问你的相册。")
+//                }
+//            }
+//
+//        } else if authorizationStatus == .authorized {
+//            /// 权限允许
+//            if let image = self.imageView.image {
+//                self.saveImage(image: image)
+//            }
+//
+//        } else {
+//            /// 权限不允许
+//            self.alertUser(message: "请在iPhone的“设置--隐私--相册”选项中，允许此App访问你的相册。")
+//        }
+//   }
+    
+    func imageWithView(_ view: UIView)-> UIImage? {
+        
+        UIGraphicsBeginImageContextWithOptions(view.bounds.size, view.isOpaque, 0.0)
+        
+        view.drawHierarchy(in: view.bounds, afterScreenUpdates: true)
+        
+        let image = UIGraphicsGetImageFromCurrentImageContext()
+        
+        UIGraphicsEndImageContext()
+        
+        return image
+        
+    }
+    
+    func takeScreenshot() -> UIImage? {
+        
+        guard let scene = self.scene else {
+            
+            return nil
+            
+        }
+
+        let renderer = UIGraphicsImageRenderer(size: (scene.view?.bounds.size)!)
+        
+        let image = renderer.image { _ in
+        
+            self.view?.drawHierarchy(in: self.view!.bounds, afterScreenUpdates: true)
+        
+            scene.view?.drawHierarchy(in: scene.view!.bounds, afterScreenUpdates: true)
+        
+        }
+
+        return image
+        
+    }
+    
+    override func motionBegan(_ motion: UIEvent.EventSubtype, with event: UIEvent?) {
+        
+        if motion == .motionShake {
+            
+            // 在这里处理摇动事件
+            // 可以执行一些动画、播放声音或者触发其他操作
+            print("Shake detected!")
+            
+            if let screenshot = takeScreenshot(){
+                
+                //UIImageWriteToSavedPhotosAlbum(screenshot, nil, nil, nil)
+                
+                //let filePath = Bundle.main.path(forResource: "Demo", ofType: "xml")
+                
+                //fileManager.createFile(atPath: Bundle.main.bundlePath, contents: screenshot, attributes: nil)
+
+                // 获取PNG数据
+                if let pngData = screenshot.pngData() {
+
+                let fileManager = FileManager.default
+
+                fileManager.createFile(atPath: Bundle.main.bundlePath, contents: pngData)
+
+                // 获取Documents目录路径
+//                guard let documentsDirectory = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first
+//
+//                    else {
+//
+//                        return
+//
+//                    }
+//
+//                // 创建文件路径
+//                    let fileURL = documentsDirectory.appendingPathComponent("newImage.png")
+//
+//                do {
+//
+//                    // 写入文件
+//                    try pngData.write(to: fileURL)
+//
+//                    print("PNG文件创建成功：\(fileURL)")
+//
+//                    } catch {
+//
+//                        print("PNG文件创建失败：\(error.localizedDescription)")
+//
+//                    }
+                    
+                }
+                
+            }
+            
+        }
+        
+    }
+    
 
     func showWin() {
         
@@ -332,6 +456,9 @@ class GameSceneHelper: SKScene {
         })]))
         
         winScreen.show()
+        
+        // 摇一摇
+        motionBegan(UIEvent.EventSubtype.motionShake, with: UIEvent()) // 监听摇动开始事件
         
     }
 

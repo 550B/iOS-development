@@ -542,7 +542,7 @@ class GameScene: GameSceneHelper {
 
     func recalculateEnemyPaths() {
         
-        // 计算恐龙位置
+        // 计算敌人位置
         let endPosition = CGPoint(x: 1224, y: 384)
         
         let enemies: [EnemyEntity] = entities.compactMap { entity in
